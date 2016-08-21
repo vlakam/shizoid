@@ -1,0 +1,36 @@
+{
+  "name": "shizoid-js",
+  "version": "0.1.0",
+  "description": "Telegram intellectual bot",
+  "main": "app/main.js",
+  "private": true,
+  "scripts": {
+    "start": "node app/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atrigger/shizoid-js.git"
+  },
+  "keywords": [
+    "telegram",
+    "chat",
+    "bot",
+    "machine learning"
+  ],
+  "author": "Vladislav Kamenev",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/atrigger/shizoid-js/issues"
+  },
+  "homepage": "https://github.com/atrigger/shizoid-js#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.23.3",
+    "sequelize": "^3.24.1",
+    "sqlite3": "^3.1.4"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^2.4.0",
+    "mocha": "^3.0.2",
+    "should": "^11.1.0"
+  }
+}
