@@ -9,11 +9,6 @@ bot.getMe().then(function (data) {
 
 models.sequelize.sync().then(function () {
     console.log('DB Initialisation successfull');
-    bot.onText(/\/echo (.+)/, function (msg, match) {
-        var fromId = msg.from.id;
-        var resp = match[1];
-        bot.sendMessage(fromId, resp);
-    });
 
     bot.on('message', onNewMessage);
     bot.on('new_chat_participant', function (msg) {
