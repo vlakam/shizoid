@@ -1,30 +1,38 @@
-const telegramBot = require('node-telegram-bot-api');
-const { config } = require('../config/config.js');
-const models = require('../models');
+(function() {
+    const telegramBot = require('node-telegram-bot-api');
+    const {config} = require('../config/config.js');
+    const models = require('../models');
+    const CommandParser = require('./commandParser.js');
+    const token = config.token || process.argv[2];
+    const Message = require('./message.js');
 
-var bot = new telegramBot(config.token, { polling: true });
-bot.getMe().then(function (data) {
-    config.myId = data.id;
-});
+    let bot = new telegramBot(token, {polling: true});
+    let commandParser = new CommandParser(bot);
 
-models.sequelize.sync().then(function () {
-    console.log('DB Initialisation successfull');
+    models.sequelize.sync().then(function () {
+        console.log('DB Initialisation successfull');
 
-    bot.on('message', onNewMessage);
-    bot.on('new_chat_participant', function (msg) {
-        if (msg.new_chat_participant.id === config.myId) {
-            invitedToNewChat(msg.chat);
+        bot.on('message', onNewMessage);
+        bot.on('new_chat_participant', function (msg) {
+            if (msg.new_chat_participant.id === config.myId) {
+                invitedToNewChat(msg.chat);
+            }
+        })
+    }, function (error) {
+        console.log(error);
+    });
+
+    function onNewMessage(msg) {
+        debugger;
+        let chatId = msg.chat.id;
+        if (commandParser.isCommand(msg)) {
+            console.log('command');
+        } else {
+            new Message(bot, msg);
         }
-    })
-}, function (error) {
-    console.log(error);
-});
+    }
 
-function onNewMessage(msg) {
-    console.log(msg);
-    var chatId = msg.chat.id;
-}
-
-function invitedToNewChat(chat) {
-    console.log(chat);
-}
+    function invitedToNewChat(chat) {
+        console.log(chat);
+    }
+})();

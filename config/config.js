@@ -1,5 +1,6 @@
 module.exports.config = {
-  token: '241016145:AAGhFVGMPPezvPzJOrtGQSG7bo2C1sJpV4k',
+  token: '296642431:AAGGWH37Td_X93YWyL6iNv4k76hsJgXKQAU',
+  myId: 296642431, // before : in token
   punctuation: {
     endSentence: '.!?',
     all: '.!?;:,'
