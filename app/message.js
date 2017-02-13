@@ -8,7 +8,6 @@ function message(bot, msg) {
     this.bot = bot;
     this.message = msg;
     models.Chat.getChat(msg).spread(function (chatInst) {
-        debugger;
         self.chat = chatInst;
         if (msg.migrate_to_chat_id) {
             chatInst.migration(msg.migrate_to_chat_id);
@@ -26,7 +25,6 @@ message.prototype.has_text = function () {
 };
 
 message.prototype.get_words = function () {
-    debugger;
     var words = _(this.getTextWithoutEntities()
         .replace(/\n|\r/, '')
         .split(' '))

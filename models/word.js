@@ -2,20 +2,20 @@
 const _ = require('lodash');
 
 module.exports = function(sequelize, DataTypes) {
-  var Word = sequelize.define('Word', {
-    word: DataTypes.STRING
+    return sequelize.define('Word', {
+      word: DataTypes.STRING
   }, {
-    classMethods: {
-      learn: function(words) {
-          _.each(words, function(wordString) {
-              Chat.findOrCreate({
-                  where: {
-                      word: wordString
-                  }
+      classMethods: {
+          learn: function (words) {
+              let self = this;
+              return _.map(words, function (wordString) {
+                  return self.findOrCreate({
+                      where: {
+                          word: wordString
+                      }
+                  });
               });
-          });
+          }
       }
-    }
   });
-  return Word;
 };
