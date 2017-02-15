@@ -25,6 +25,7 @@
   "homepage": "https://github.com/atrigger/shizoid-js#readme",
   "dependencies": {
     "node-telegram-bot-api": "^0.23.3",
+    "promise-sequence": "^0.2.2",
     "sequelize": "^3.24.1",
     "sqlite3": "^3.1.4"
   },

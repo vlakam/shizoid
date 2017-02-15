@@ -23,7 +23,6 @@
     });
 
     function onNewMessage(msg) {
-        debugger;
         let chatId = msg.chat.id;
         if (commandParser.isCommand(msg)) {
             console.log('command');
