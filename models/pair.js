@@ -15,43 +15,45 @@ module.exports = function (sequelize) {
                 learn: function (message) {
                     let self = this;
                     let Word = sequelize.import('./word');
-                    Promise.all(Word.learn(message.words)).then(function () {
+                    Word.learn(message.words).then(function (response) {
                         let words = message.words;
 
-                        while (_.size(words)) {
-                            let triplet = _.take(words, 3);
-                            words.shift();
-                            let allWordsPromises = _.map(triplet, function (element) {
-                                return Word.find({
-                                    where: {
-                                        word: element
-                                    }
-                                })
-                            });
-                            Promise.all(allWordsPromises).then(function (Words) {
-                                //3
-                                self.findOrCreate({
-                                    where: {
-                                        ChatId: message.message.chat_id,
-                                        firstId: Words[0].id,
-                                        secondId: Words[1].id
-                                    },
-                                    include: [{model: sequelize.import('./reply'), all: true}]
-                                }).then(function (pair) {
-                                    let reply = _.find(pair.replies, function (reply) {
-                                        return reply.dataValues.WordId === Words[2].id;
-                                    });
-                                    if (!reply) {
-                                        sequelize.import('./reply').create({
-                                            PairId: pair.dataValues.id,
-                                            WordId: Words[2].id
-                                        })
-                                    } else {
-                                        reply.increment('counter');
-                                    }
-                                });
-                            });
-                        }
+                        // while (_.size(words) >= 3) {
+                        //     let triplet = _.take(words, 3);
+                        //     words.shift();
+                        //     let allWordsPromises = _.map(triplet, function (element) {
+                        //         return Word.find({
+                        //             where: {
+                        //                 word: element
+                        //             }
+                        //         })
+                        //     });
+                        //     Promise.all(allWordsPromises).then(function (Words) {
+                        //         //3
+                        //         self.findOrCreate({
+                        //             where: {
+                        //                 ChatId: message.message.chat_id,
+                        //                 firstId: Words[0].dataValues.id,
+                        //                 secondId: Words[1].dataValues.id
+                        //             },
+                        //             include: [{model: sequelize.import('./reply'), all: true}]
+                        //         }).then(function (pair) {
+                        //             let reply = _.find(pair.replies, function (reply) {
+                        //                 return reply.dataValues.WordId === Words[2].dataValues.id;
+                        //             });
+                        //             if (!reply) {
+                        //                 sequelize.import('./reply').create({
+                        //                     PairId: pair[0].dataValues.id,
+                        //                     WordId: (Words[2] || {dataValues: {id: null}}).dataValues.id
+                        //                 })
+                        //             } else {
+                        //                 reply.increment('counter');
+                        //             }
+                        //         });
+                        //     }).catch(function (reason) {
+                        //         console.log('learn failed: ', reason);
+                        //     });
+                        // }
                     });
                 },
                 getPair: function (chatId, firstId, secondId) {
@@ -69,7 +71,8 @@ module.exports = function (sequelize) {
                             {
                                 model: sequelize.import('./reply'),
                                 all: true,
-                                limit: 3
+                                limit: 3,
+                                separate: false
                             }
                         ],
                         order: [

@@ -7,16 +7,16 @@ function message(bot, msg) {
     let self = this;
     this.bot = bot;
     this.message = msg;
-    models.Chat.getChat(msg).spread(function (chatInst) {
-        self.chat = chatInst;
+    models.Chat.getChat(msg).then(function (chatInst) {
+        self.chat = chatInst[0];
         if (msg.migrate_to_chat_id) {
             chatInst.migration(msg.migrate_to_chat_id);
         }
         if (self.has_text()) {
             self.text = msg.text;
             self.words = self.get_words();
+            self.process();
         }
-
     });
 }
 
@@ -38,6 +38,7 @@ message.prototype.get_words = function () {
             return _.lowerCase(word);
         }).value();
     console.log(words);
+    return words;
 };
 
 
@@ -54,15 +55,15 @@ message.prototype.isReplyToBot = function () {
 };
 
 message.prototype.hasAnchors = function () {
-    return this.has_text() && _.contains(this.text.toLowerCase(), 'шизик');
+    return this.has_text() && _.includes(this.text.toLowerCase(), 'шизик');
 };
 
 message.prototype.answer = function (msg) {
-    this.bot.sendMessage(this.message.chat.id, message);
+    this.bot.sendMessage(this.message.chat.id, msg);
 };
 
 message.prototype.reply = function (msg) {
-    this.bot.sendMessage(this.message.chat.id, message, {
+    this.bot.sendMessage(this.message.chat.id, msg, {
         reply_to_message_id: this.message.message.id
     });
 };
@@ -70,10 +71,17 @@ message.prototype.reply = function (msg) {
 message.prototype.process = function () {
     models.Pair.learn(this);
     if(this.hasAnchors() || this.isReplyToBot() || this.randomAnswer()) {
-        const reply = models.Pair.generate(this);
-        if(reply) {
-            this.answer(reply);
-        }
+        models.Pair.generate(this).then(function (replyArray) {
+            if(!_.size(replyArray)) {
+                return;
+            }
+
+            let reply = replyArray.join(' ');
+
+            if(reply) {
+                this.answer(reply);
+            }
+        });
     }
 };
 

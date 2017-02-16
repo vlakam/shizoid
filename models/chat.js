@@ -21,7 +21,9 @@ module.exports = function (sequelize, DataTypes) {
                 where: {
                     telegram_id: tg_id,
                     chat_type: chat.type
-                }, defaults: {}
+                },
+                defaults: {},
+                limit: 1
             });//promise??
         }
       },
