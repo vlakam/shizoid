@@ -5,29 +5,30 @@
   "main": "app/main.js",
   "private": true,
   "scripts": {
-    "start": "node app/main.js"
+    "start": "node --harmony app/main.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/atrigger/shizoid-js.git"
+    "url": "git+https://github.com/vlakam/shizoid-js.git"
   },
   "keywords": [
     "telegram",
     "chat",
-    "bot",
-    "machine learning"
+    "bot"
   ],
   "author": "Vladislav Kamenev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/atrigger/shizoid-js/issues"
+    "url": "https://github.com/vlakam/shizoid-js/issues"
   },
-  "homepage": "https://github.com/atrigger/shizoid-js#readme",
+  "homepage": "https://github.com/vlakam/shizoid-js#readme",
   "dependencies": {
     "node-telegram-bot-api": "^0.23.3",
+    "pg": "^6.1.2",
+    "pg-hstore": "^2.3.2",
+    "promise-seq": "^3.0.0",
     "promise-sequence": "^0.2.2",
-    "sequelize": "^3.24.1",
-    "sqlite3": "^3.1.4"
+    "sequelize": "^3.30.2"
   },
   "devDependencies": {
     "sequelize-cli": "^2.4.0",

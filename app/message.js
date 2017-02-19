@@ -12,6 +12,7 @@ function message(bot, msg) {
         if (msg.migrate_to_chat_id) {
             chatInst.migration(msg.migrate_to_chat_id);
         }
+
         if (self.has_text()) {
             self.text = msg.text;
             self.words = self.get_words();
@@ -25,27 +26,18 @@ message.prototype.has_text = function () {
 };
 
 message.prototype.get_words = function () {
-    var words = _(this.getTextWithoutEntities()
-        .replace(/\n|\r/, '')
-        .split(' '))
-        .map(function (word) {
-            return _.trim(word);
-        })
-        .filter(function (word) {
-            return word.length > 0 && word[0] !== '@';
-        })
-        .map(function (word) {
-            return _.lowerCase(word);
-        }).value();
-    console.log(words);
-    return words;
+    return _.uniq(_.map(_.words(this.getTextWithoutEntities()), (word) => { return _.lowerCase(word);}));
 };
 
 
 message.prototype.getTextWithoutEntities = function () {
+    if(!this.message.entities) {
+        return this.text;
+    }
+
     var text = _.clone(this.text);
-    _.each(this.message.entitites, function (entity) {
-        text.replace(text.substring(entity.offset, entity.length), '');
+    _.each(this.message.entities, function (entity) {
+        text = text.replace(text.substr(entity.offset, entity.length), '');
     });
     return text;
 };
@@ -68,21 +60,21 @@ message.prototype.reply = function (msg) {
     });
 };
 
-message.prototype.process = function () {
-    models.Pair.learn(this);
-    if(this.hasAnchors() || this.isReplyToBot() || this.randomAnswer()) {
-        models.Pair.generate(this).then(function (replyArray) {
-            if(!_.size(replyArray)) {
-                return;
-            }
-
-            let reply = replyArray.join(' ');
-
-            if(reply) {
-                this.answer(reply);
-            }
-        });
-    }
+message.prototype.process = async function () {
+    await models.Pair.learn(this);
+    // if(this.hasAnchors() || this.isReplyToBot() || this.randomAnswer()) {
+    //     models.Pair.generate(this).then(function (replyArray) {
+    //         if(!_.size(replyArray)) {
+    //             return;
+    //         }
+    //
+    //         let reply = replyArray.join(' ');
+    //
+    //         if(reply) {
+    //             this.answer(reply);
+    //         }
+    //     });
+    // }
 };
 
 message.prototype.randomAnswer = function () {
