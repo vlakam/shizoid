@@ -16,33 +16,32 @@ module.exports = function (sequelize) {
                     let Word = sequelize.import('./word');
                     let Reply = sequelize.import('./reply');
                     let response = await Word.learn(message.words);
-                    let words = _.map(response, function (element) {
-                        return {
-                            id: element.get('id'),
-                            word: element.get('word')
-                        }
+                    let words = [null];
+                    _.each(response, function (element) {
+                        words.push(element.get('id'))
                     });
+                    if (_.last(words) !== null) words.push(null);
 
-                    while (_.size(words) >= 3) {
+                    while (_.size(words)) {
                         let triplet = _.take(words, 3);
                         words.shift();
                         let pair = (await self.findOrCreate({
                             where: {
                                 ChatId: message.chat.get('id'),
-                                firstId: triplet[0].id,
-                                secondId: triplet[1].id
+                                firstId: triplet[0],
+                                secondId: triplet[1]
                             },
                             include: [{model: Reply, all: true}]
                         }))[0];
 
                         let reply = _.find(pair.Replies, function (reply) {
-                            return reply.get('WordId') === triplet[2].id;
+                            return reply.get('WordId') === triplet[2];
                         });
 
                         if (!reply) {
                             pair.createReply({
                                 PairId: pair.get('id'),
-                                WordId: (triplet[2] || {id: null}).id
+                                WordId: triplet[2]
                             })
                         } else {
                             reply.increment('counter');
@@ -51,29 +50,56 @@ module.exports = function (sequelize) {
                 },
                 getPair: async function (chatId, firstId, secondId) {
                     let self = this;
-                    firstId = firstId || secondId;
-                    let pair = await self.findAll({
-                        where: {
-                            ChatId: chatId,
-                            firstId: firstId,
-                            secondId: secondId,
-                            createdAt: {
-                                $lt: new Date((!config.debug) ? new Date() - 10 * 60 * 1000 : new Date())
-                            }
-                        },
-                        include: [
-                            {
-                                model: sequelize.import('./reply'),
-                                all: true,
-                                nested: true,
-                                limit: 3,
-                                separate: false
-                            }
-                        ],
-                        order: [
-                            [sequelize.import('./reply'), 'counter', 'DESC']
-                        ]
-                    });
+                    let pair = null;
+                    if (!firstId) {
+                        pair = await self.findAll({
+                            where: {
+                                ChatId: chatId,
+                                secondId: secondId,
+                                createdAt: {
+                                    $lt: new Date((!config.debug) ? new Date() - 10 * 60 * 1000 : new Date())
+                                }
+                            },
+                            include: [
+                                {
+                                    model: sequelize.import('./reply'),
+                                    all: true,
+                                    nested: true,
+                                    limit: 10,
+                                    separate: false
+                                }
+                            ],
+                            order: [
+                                [sequelize.import('./reply'), 'counter', 'DESC']
+                            ],
+                            limit: 10
+                        });
+                    } else {
+                        pair = await self.findAll({
+                            where: {
+                                ChatId: chatId,
+                                firstId: firstId,
+                                secondId: secondId,
+                                createdAt: {
+                                    $lt: new Date((!config.debug) ? new Date() - 10 * 60 * 1000 : new Date())
+                                }
+                            },
+                            include: [
+                                {
+                                    model: sequelize.import('./reply'),
+                                    all: true,
+                                    nested: true,
+                                    limit: 10,
+                                    separate: false
+                                }
+                            ],
+                            order: [
+                                [sequelize.import('./reply'), 'counter', 'DESC']
+                            ],
+                            limit: 10
+                        });
+                    }
+
 
                     return _.sample(pair);
                 },
@@ -101,11 +127,9 @@ module.exports = function (sequelize) {
                         let pair = await self.getPair(message.chat.get('id'), firstWord, secondWord);
                         while (pair && safety_counter) {
                             safety_counter--;
-                            let reply = _.sample(_.sortBy(pair.Replies, function (reply) {
-                                reply.get('counter');
-                            }).reverse());
-                            firstWord = pair.get('firstId');
-                            secondWord = reply.get('WordId');
+                            let reply = _.sample(pair.Replies);
+                            firstWord = pair.get('second').get('id');
+                            secondWord = reply.get('Word').get('id');
                             if (!_.size(sentence)) {
                                 sentence = _.capitalize(pair.get('second').get('word') + ' ');
                                 wordIds = _.difference(wordIds, [pair.get('second').get('id')])
@@ -119,7 +143,7 @@ module.exports = function (sequelize) {
                             pair = await self.getPair(message.chat.id, firstWord, secondWord);
                         }
 
-                        if(_.size(sentence)){
+                        if (_.size(sentence)) {
                             sentence = _.trim(sentence);
                             sentence += _.sample(config.punctuation.endSentence.split(''));
                         }
@@ -127,7 +151,7 @@ module.exports = function (sequelize) {
                         return sentence;
                     };
 
-                    for(let i = 0; i < sentences; i++) {
+                    for (let i = 0; i < sentences; i++) {
                         let tempSentence = await generateSentence(message);
                         result.push(tempSentence);
                     }
