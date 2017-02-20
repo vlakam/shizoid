@@ -49,78 +49,90 @@ module.exports = function (sequelize) {
                         }
                     }
                 },
-                getPair: function (chatId, firstId, secondId) {
+                getPair: async function (chatId, firstId, secondId) {
                     let self = this;
-                    return self.find({
+                    firstId = firstId || secondId;
+                    let pair = await self.findAll({
                         where: {
                             ChatId: chatId,
                             firstId: firstId,
                             secondId: secondId,
                             createdAt: {
-                                $lt: new Date(new Date() - 10 * 60 * 1000)
+                                $lt: new Date((!config.debug) ? new Date() - 10 * 60 * 1000 : new Date())
                             }
                         },
                         include: [
                             {
                                 model: sequelize.import('./reply'),
                                 all: true,
+                                nested: true,
                                 limit: 3,
                                 separate: false
                             }
                         ],
                         order: [
                             [sequelize.import('./reply'), 'counter', 'DESC']
-                        ],
-                        limit: 3
-                    })
+                        ]
+                    });
+
+                    return _.sample(pair);
                 },
                 generate: async function (message) {
                     let self = this;
                     let Word = sequelize.import('./word');
-                    let Reply = sequelize.import('./reply');
                     let usingWords = _.difference(message.words, config.punctuation.endSentence.split(''));
 
-                    return Word.findAll({
+                    let response = await Word.findAll({
                         where: {
                             word: usingWords
                         }
-                    }).then(function (results) {
-                        let wordIds = _.map(results, function (result) {
-                            return result.dataValue.id;
-                        });
-                        let sentences = _.random(1, 3);
+                    });
+                    let wordIds = _.map(response, function (result) {
+                        return result.get('id');
+                    });
+                    let sentences = _.random(1, 3);
+                    let result = [];
 
-                        let generateSentence = async(message) => {
-                            let sentence = '';
-                            let safety_counter = 50;
-                            let firstWord = null;
-                            let secondWord = wordIds;
-                            let pair = null;
-                            while (pair = await self.getPair(message.chat.id, firstWord, secondWord) && safety_counter) {
-                                safety_counter--;
-                                let reply = _.sample(pair.replies);
-                                firstWord = pair.dataValues.first.id;
-                                secondWord = reply.dataValues.word.id;
-                                if (!_.size(sentence)) {
-                                    sentence = _.capitalize(pair.dataValues.second.word + ' ');
-                                    wordIds = _.difference(wordIds, [pair.dataValues.second.id])
-                                }
-
-                                if (reply.dataValues.word.word) {
-                                    sentence = sentence + reply.dataValues.word.word + ' ';
-                                } else {
-                                    break;
-                                }
+                    let generateSentence = async function (message) {
+                        let sentence = '';
+                        let safety_counter = 50;
+                        let firstWord = null;
+                        let secondWord = wordIds;
+                        let pair = await self.getPair(message.chat.get('id'), firstWord, secondWord);
+                        while (pair && safety_counter) {
+                            safety_counter--;
+                            let reply = _.sample(_.sortBy(pair.Replies, function (reply) {
+                                reply.get('counter');
+                            }).reverse());
+                            firstWord = pair.get('firstId');
+                            secondWord = reply.get('WordId');
+                            if (!_.size(sentence)) {
+                                sentence = _.capitalize(pair.get('second').get('word') + ' ');
+                                wordIds = _.difference(wordIds, [pair.get('second').get('id')])
                             }
 
+                            if (_.size(reply.get('Word').get('word'))) {
+                                sentence = sentence + reply.get('Word').get('word') + ' ';
+                            } else {
+                                break;
+                            }
+                            pair = await self.getPair(message.chat.id, firstWord, secondWord);
+                        }
+
+                        if(_.size(sentence)){
                             sentence = _.trim(sentence);
+                            sentence += _.sample(config.punctuation.endSentence.split(''));
+                        }
 
-                            return sentence;
-                        };
+                        return sentence;
+                    };
 
+                    for(let i = 0; i < sentences; i++) {
+                        let tempSentence = await generateSentence(message);
+                        result.push(tempSentence);
+                    }
 
-                        return sequence(_.times(sentences, _.partial(generateSentence, message)));
-                    });
+                    return result;
                 }
             }
         }

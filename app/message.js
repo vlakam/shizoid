@@ -26,12 +26,14 @@ message.prototype.has_text = function () {
 };
 
 message.prototype.get_words = function () {
-    return _.uniq(_.map(_.words(this.getTextWithoutEntities()), (word) => { return _.lowerCase(word);}));
+    return _.uniq(_.map(_.words(this.getTextWithoutEntities()), (word) => {
+        return _.lowerCase(word);
+    }));
 };
 
 
 message.prototype.getTextWithoutEntities = function () {
-    if(!this.message.entities) {
+    if (!this.message.entities) {
         return this.text;
     }
 
@@ -51,7 +53,7 @@ message.prototype.hasAnchors = function () {
 };
 
 message.prototype.answer = function (msg) {
-    this.bot.sendMessage(this.message.chat.id, msg);
+    this.bot.sendMessage(this.message.chat.id, msg).catch((error) => console.error(error));
 };
 
 message.prototype.reply = function (msg) {
@@ -62,23 +64,22 @@ message.prototype.reply = function (msg) {
 
 message.prototype.process = async function () {
     await models.Pair.learn(this);
-    // if(this.hasAnchors() || this.isReplyToBot() || this.randomAnswer()) {
-    //     models.Pair.generate(this).then(function (replyArray) {
-    //         if(!_.size(replyArray)) {
-    //             return;
-    //         }
-    //
-    //         let reply = replyArray.join(' ');
-    //
-    //         if(reply) {
-    //             this.answer(reply);
-    //         }
-    //     });
-    // }
+    if (this.hasAnchors() || this.isReplyToBot() || this.randomAnswer() || config.debug) {
+        let replyArray = await models.Pair.generate(this);
+        if (!_.size(replyArray)) {
+            return;
+        }
+
+        let reply = replyArray.join(' ');
+
+        if (reply) {
+            this.answer(reply);
+        }
+    }
 };
 
 message.prototype.randomAnswer = function () {
-    return Math.random() * 100 >= this.chat.dataValues.random_chance;
+    return _.random(0, 100) <= this.chat.dataValues.random_chance;
 };
 
 module.exports = message;

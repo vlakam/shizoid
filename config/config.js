@@ -11,6 +11,8 @@ module.exports.config = {
         password: 'shizoid',
         database: 'postgres',
         hostname: 'localhost',
-        port: 5432
-    }
+        port: 5432,
+        logging: true
+    },
+    debug: true
 };
