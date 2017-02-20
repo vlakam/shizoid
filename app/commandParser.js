@@ -51,7 +51,7 @@ CommandParser.prototype.get_gab = function (msg) {
 
 CommandParser.prototype.set_gab = function (msg) {
     let self = this;
-    let chance = parseInt(msg.text);
+    let chance = parseInt(msg.text) || 0;
     models.Chat.find({where: {telegram_id: msg.chat.id}}).then(function (chat) {
         chat.set('random_chance', chance);
         chat.save();
