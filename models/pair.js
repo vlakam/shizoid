@@ -17,8 +17,8 @@ module.exports = function (sequelize) {
                     let Reply = sequelize.import('./reply');
                     let response = await Word.learn(message.words);
                     let words = [null];
-                    _.each(response, function (element) {
-                        words.push(element.get('id'))
+                    _.each(message.words, function (word) {
+                        words.push(_.find(response, (el) => el.get('word') === word).get('id'));
                     });
                     if (_.last(words) !== null) words.push(null);
 
