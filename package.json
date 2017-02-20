@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/vlakam/shizoid-js#readme",
   "dependencies": {
-    "node-telegram-bot-api": "^0.23.3",
+    "node-telegram-bot-api": "^0.27.0",
     "pg": "^6.1.2",
     "pg-hstore": "^2.3.2",
     "promise-seq": "^3.0.0",

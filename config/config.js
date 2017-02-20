@@ -14,5 +14,5 @@ module.exports.config = {
         port: 5432,
         logging: true
     },
-    debug: true
+    debug: false
 };

@@ -37,9 +37,10 @@ message.prototype.getTextWithoutEntities = function () {
         return this.text;
     }
 
-    var text = _.clone(this.text);
+    let self = this;
+    let text = _.clone(this.text);
     _.each(this.message.entities, function (entity) {
-        text = text.replace(text.substr(entity.offset, entity.length), '');
+        text = text.replace(self.text.substr(entity.offset, entity.length), '');
     });
     return text;
 };

@@ -2,11 +2,11 @@
 
 module.exports = function (sequelize, DataTypes) {
   let Chat = sequelize.define('Chat', {
-    telegram_id: DataTypes.INTEGER(8),
+    telegram_id: DataTypes.STRING,
     chat_type: DataTypes.ENUM('private', 'group', 'supergroup'),
     random_chance: {
         type: DataTypes.INTEGER(2),
-        defaultValue: 50
+        defaultValue: 10
     }
   }, {
       classMethods: {
@@ -18,12 +18,12 @@ module.exports = function (sequelize, DataTypes) {
             let tg_id = chat.id;
             return Chat.findOrCreate({
                 where: {
-                    telegram_id: tg_id,
+                    telegram_id: tg_id.toString(),
                     chat_type: chat.type
                 },
                 defaults: {},
                 limit: 1
-            });//promise??
+            });
         }
       },
       instanceMethods: {
