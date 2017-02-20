@@ -8,6 +8,9 @@
 
     let bot = new telegramBot(token, {polling: true});
     let commandParser = new CommandParser(bot);
+    bot.getMe().then(function (me) {
+        bot.me = me;
+    });
 
     models.sequelize.sync().then(function () {
         console.log('DB Initialisation successfull');
@@ -23,9 +26,8 @@
     });
 
     function onNewMessage(msg) {
-        let chatId = msg.chat.id;
         if (commandParser.isCommand(msg)) {
-            console.log('command');
+            commandParser.process(msg);
         } else {
             new Message(bot, msg);
         }

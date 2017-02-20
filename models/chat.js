@@ -1,5 +1,4 @@
 'use strict';
-const { chatTypes } = require('../app/chatTypes.js');
 
 module.exports = function (sequelize, DataTypes) {
   let Chat = sequelize.define('Chat', {
