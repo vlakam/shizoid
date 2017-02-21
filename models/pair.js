@@ -19,6 +19,9 @@ module.exports = function (sequelize) {
                     let words = [null];
                     _.each(message.words, function (word) {
                         words.push(_.find(response, (el) => el.get('word') === word).get('id'));
+                        if(_.indexOf(config.punctuation.endSentence, _.last(word)) >= 0) {
+                            words.push(null);
+                        }
                     });
                     if (_.last(words) !== null) words.push(null);
 
@@ -121,7 +124,9 @@ module.exports = function (sequelize) {
 
                         if (_.size(sentence)) {
                             sentence = _.trim(sentence);
-                            sentence += _.sample(config.punctuation.endSentence.split(''));
+                            if(_.indexOf(config.punctuation.endSentence, _.last(sentence)) < 0) {
+                                sentence += _.sample(config.punctuation.endSentence.split(''));
+                            }
                         }
 
                         return sentence;

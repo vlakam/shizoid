@@ -26,9 +26,9 @@ message.prototype.has_text = function () {
 };
 
 message.prototype.get_words = function () {
-    return _.uniq(_.map(_.words(this.getTextWithoutEntities()), (word) => {
-        return _.lowerCase(word);
-    }));
+    return _.map(_.split(this.getTextWithoutEntities(), /\s+?|\\n/), (word) => {
+        return _.toLower(word);
+    });
 };
 
 
