@@ -62,6 +62,10 @@ message.prototype.process = async function () {
 
     if (this.has_text()) {
         await models.Pair.learn(this);
+        if(Math.abs(this.message.date - Math.floor(Date.now() / 1000)) > 20) {
+            return;
+        }
+
         if (this.hasAnchors() || this.isReplyToBot() || this.randomAnswer() || config.debug) {
             let replyArray = await this.generateAnswer();
             if (!_.size(replyArray) || !_.size(replyArray[0])) {
@@ -71,7 +75,7 @@ message.prototype.process = async function () {
             let reply = replyArray.join(' ');
 
             if (reply) {
-                this.answer(reply);
+                config.debug ? this.reply(reply) : this.answer(reply);
             }
         }
     }
