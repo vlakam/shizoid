@@ -13,10 +13,10 @@ module.exports = function (sequelize, DataTypes) {
         associate: function (models) {
             Chat.hasMany(models.Pair);
         },
-        getChat: function (tg_message) {
+        getChat: async function (tg_message) {
             let chat = tg_message.chat;
             let tg_id = chat.id;
-            return Chat.findOrCreate({
+            let response = await Chat.findOrCreate({
                 where: {
                     telegram_id: tg_id.toString(),
                     chat_type: chat.type
@@ -24,6 +24,8 @@ module.exports = function (sequelize, DataTypes) {
                 defaults: {},
                 limit: 1
             });
+
+            return response[0];
         }
       },
       instanceMethods: {

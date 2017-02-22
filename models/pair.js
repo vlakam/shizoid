@@ -94,7 +94,7 @@ module.exports = function (sequelize) {
                     let wordIds = _.map(response, function (result) {
                         return result.get('id');
                     });
-                    let sentences = _.random(1, 3);
+                    let sentences = _.random(0, 3) + 1;
                     let result = [];
 
                     let generateSentence = async function (message) {

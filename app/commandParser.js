@@ -1,7 +1,28 @@
 const {config} = require('../config/config.js');
 const models = require('../models');
 const _ = require('lodash');
+const Message = require('./message.js');
 
+const eightballAnswer = ['Бесспорно.',
+    'Предрешено.',
+    'Никаких сомнений.',
+    'Определённо да.',
+    'Можешь быть уверен в этом.',
+    'Мне кажется — «да»',
+    'Вероятнее всего.',
+    'Хорошие перспективы.',
+    'Знаки говорят — «да».',
+    'Да.',
+    'Пока не ясно.',
+    'Cпроси завтра.',
+    'Лучше не рассказывать.',
+    'Сегодня нельзя предсказать.',
+    'Сконцентрируйся и спроси опять.',
+    'Даже не думай.',
+    'Мой ответ — «нет».',
+    'По моим данным — «нет».',
+    'Перспективы не очень хорошие.',
+    'Весьма сомнительно.'];
 
 function CommandParser(bot) {
     this.bot = bot;
@@ -14,7 +35,10 @@ CommandParser.prototype.isCommand = function (msg) {
 CommandParser.prototype.process = function (msg) {
     let commandEntity = _.find(msg.entities, {type: 'bot_command', offset: 0});
     let command = msg.text.substr(commandEntity.offset, commandEntity.length);
-    msg.text = msg.text.substr(commandEntity.length);
+    msg.text = msg.text.substr(commandEntity.length + 1);
+    msg.entities = _.filter(msg.entities, (entity) => {
+        return entity.type !== 'bot_command'
+    });
 
     if (_.includes(command, 'isCommand') || _.includes(command, 'process')) {
         return;
@@ -26,7 +50,7 @@ CommandParser.prototype.process = function (msg) {
         }
     }
 
-    command = command.split('@')[0].substr(1);
+    command = _.trim(command.split('@')[0].substr(1));
 
     if (this[command]) {
         this[command](msg);
@@ -43,7 +67,7 @@ CommandParser.prototype.get_gab = async function (msg) {
     let self = this;
     let chat = await models.Chat.getChat(msg);
 
-    self.bot.sendMessage(msg.chat.id, chat[0].get('random_chance'), {
+    self.bot.sendMessage(msg.chat.id, chat.get('random_chance'), {
         reply_to_message_id: msg.message_id
     });
 };
@@ -67,20 +91,26 @@ CommandParser.prototype.set_gab = async function (msg) {
     }
 
     let chat = await models.Chat.getChat(msg);
-    chat[0].set('random_chance', chance);
-    chat[0].save();
+    chat.set('random_chance', chance);
+    chat.save();
     self.bot.sendMessage(msg.chat.id, 'Setting gab to ' + chance, {
         reply_to_message_id: msg.message_id
     });
 };
 
 CommandParser.prototype.get_pairs = async function (msg) {
-    let chat = (await models.Chat.getChat(msg))[0];
+    let chat = await models.Chat.getChat(msg);
     let counter = await models.Pair.count({where: {ChatId: chat.get('id')}});
 
     this.bot.sendMessage(msg.chat.id, 'Known pairs for this chat ' + counter, {
         reply_to_message_id: msg.message_id
     });
+};
+
+CommandParser.prototype.eightball = async function (msg) {
+    let mm = new Message(this.bot, msg);
+    let additionalAnswer = await mm.generateAnswer();
+    mm.reply(_.sample(eightballAnswer) + ' ' + additionalAnswer.join(' '));
 };
 
 module.exports = CommandParser;

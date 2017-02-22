@@ -29,7 +29,7 @@
         if (commandParser.isCommand(msg)) {
             commandParser.process(msg);
         } else {
-            new Message(bot, msg);
+            new Message(bot, msg).process();
         }
     }
 
