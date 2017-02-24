@@ -9,8 +9,8 @@ module.exports.config = {
         dialect: 'postgres',
         username: 'shizoid',
         password: 'shizoid',
-        database: 'postgres',
-        hostname: 'localhost',
+        database: 'shizoid',
+        host: 'localhost',
         port: 5432,
         logging: true
     },
