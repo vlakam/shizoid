@@ -10,7 +10,7 @@ module.exports.config = {
         username: 'shizoid',
         password: 'shizoid',
         database: 'shizoid',
-        hostname: 'localhost',
+        host: 'localhost',
         port: 5432,
         logging: false
     },

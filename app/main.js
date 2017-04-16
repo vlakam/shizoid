@@ -23,7 +23,7 @@
         console.log(error);
     });
 
-    async function onNewMessage(msg) {
+    function onNewMessage(msg) {
         if (commandParser.isCommand(msg)) {
             commandParser.process(msg);
         } else {

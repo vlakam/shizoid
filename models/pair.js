@@ -30,7 +30,7 @@ module.exports = function (sequelize) {
                     let words = [null];
                     _.each(message.words, function (word) {
                         words.push(_.find(response, (el) => el.get('word') === word).get('id'));
-                        if(_.indexOf(config.punctuation.endSentence, _.last(word)) >= 0) {
+                        if (_.indexOf(config.punctuation.endSentence, _.last(word)) >= 0) {
                             words.push(null);
                         }
                     });
@@ -39,26 +39,32 @@ module.exports = function (sequelize) {
                     while (_.size(words)) {
                         let triplet = _.take(words, 3);
                         words.shift();
-                        let pair = (await self.findOrCreate({
-                            where: {
-                                ChatId: message.chat.get('id'),
-                                firstId: triplet[0],
-                                secondId: triplet[1]
-                            },
-                            include: [{model: Reply, all: true}]
-                        }))[0];
+                        try {
+                            let pair = (await self.findOrCreate({
+                                where: {
+                                    ChatId: message.chat.get('id'),
+                                    firstId: triplet[0],
+                                    secondId: triplet[1]
+                                },
+                                include: [{model: Reply, all: true}]
+                            }))[0];
 
-                        let reply = _.find(pair.Replies, function (reply) {
-                            return reply.get('WordId') === triplet[2];
-                        });
 
-                        if (!reply) {
-                            pair.createReply({
-                                PairId: pair.get('id'),
-                                WordId: triplet[2]
-                            })
-                        } else {
-                            reply.increment('counter');
+                            let reply = _.find(pair.Replies, function (reply) {
+                                return reply.get('WordId') === triplet[2];
+                            });
+
+                            if (!reply) {
+                                pair.createReply({
+                                    PairId: pair.get('id'),
+                                    WordId: triplet[2]
+                                })
+                            } else {
+                                reply.increment('counter');
+                            }
+
+                        } catch (e) {
+                            console.log(e);
                         }
                     }
                 },
@@ -135,7 +141,7 @@ module.exports = function (sequelize) {
 
                         if (_.size(sentence)) {
                             sentence = _.trim(sentence);
-                            if(_.indexOf(config.punctuation.endSentence, _.last(sentence)) < 0) {
+                            if (_.indexOf(config.punctuation.endSentence, _.last(sentence)) < 0) {
                                 sentence += _.sample(config.punctuation.endSentence.split(''));
                             }
                         }
