@@ -1,5 +1,5 @@
 module.exports.config = {
-    token: '296642431:AAGGWH37Td_X93YWyL6iNv4k76hsJgXKQAU',
+    token: '296642431:AAHxNkgJyWEXK8qS94BQ-OnTWv4dKxRwytg',
     myId: 296642431, // before : in token
     punctuation: {
         endSentence: '.!?',
@@ -9,10 +9,10 @@ module.exports.config = {
         dialect: 'postgres',
         username: 'shizoid',
         password: 'shizoid',
-        database: 'postgres',
+        database: 'shizoid',
         hostname: 'localhost',
         port: 5432,
-        logging: true
+        logging: false
     },
     debug: false
 };

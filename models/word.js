@@ -8,7 +8,8 @@ module.exports = function (sequelize, DataTypes) {
         indexes: [
             {
                 unique: true,
-                fields: ['word']
+                fields: ['word'],
+		operator: 'varchar_pattern_ops'
             }
         ],
         classMethods: {

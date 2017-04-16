@@ -4,6 +4,17 @@ const _ = require('lodash');
 
 module.exports = function (sequelize) {
     let Pair = sequelize.define('Pair', {}, {
+	    indexes: [
+		{
+                	fields: ['ChatId']
+	        },
+		{
+                	fields: ['firstId']
+                },
+		{
+                	fields: ['secondId']
+	        }
+	    ],
             classMethods: {
                 associate: function (models) {
                     Pair.belongsTo(models.Chat);
@@ -68,14 +79,14 @@ module.exports = function (sequelize) {
                                 model: sequelize.import('./reply'),
                                 all: true,
                                 nested: true,
-                                limit: 10,
+                                limit: 3,
                                 separate: false
                             }
                         ],
                         order: [
                             [sequelize.import('./reply'), 'counter', 'DESC']
                         ],
-                        limit: 10
+                        limit: 3
                     });
 
 

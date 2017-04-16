@@ -14,26 +14,29 @@
 
     models.sequelize.sync().then(function () {
         console.log('DB Initialisation successfull');
+        process.on('exit', exitHandler);
+        process.on('SIGINT', exitHandler);
+        process.on('uncaughtException', exitHandler);
 
         bot.on('message', onNewMessage);
-        bot.on('new_chat_participant', function (msg) {
-            if (msg.new_chat_participant.id === config.myId) {
-                invitedToNewChat(msg.chat);
-            }
-        })
     }, function (error) {
         console.log(error);
     });
 
-    function onNewMessage(msg) {
+    async function onNewMessage(msg) {
         if (commandParser.isCommand(msg)) {
             commandParser.process(msg);
         } else {
-            new Message(bot, msg).process();
+            try {
+                new Message(bot, msg).process();
+            } catch (e) {
+                console.log(e);
+            }
         }
     }
 
-    function invitedToNewChat(chat) {
-        console.log(chat);
+    function exitHandler() {
+        models.sequelize.close();
+        process.exit(0);
     }
 })();

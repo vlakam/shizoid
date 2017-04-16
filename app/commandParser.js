@@ -125,4 +125,16 @@ CommandParser.prototype.leaveAll = async function (msg) {
     });
 };
 
+CommandParser.prototype.banUser = async function (msg) {
+    if (msg.from.id !== 36586950) {
+        return;
+    }
+
+    let userId = msg.text;
+    let user = await models.User.getUser(userId);
+    user.set('banned', !user.get('banned'));
+    user.save();
+    this.bot.sendMessage(msg.chat.id, 'Banned' + msg.text);
+};
+
 module.exports = CommandParser;

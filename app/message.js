@@ -61,10 +61,10 @@ message.prototype.process = async function () {
     }
 
     if (this.has_text()) {
-        await models.Pair.learn(this);
         if(Math.abs(this.message.date - Math.floor(Date.now() / 1000)) > 20) {
             return;
         }
+	await models.Pair.learn(this);
 
         if (this.hasAnchors() || this.isReplyToBot() || this.randomAnswer() || config.debug) {
             let replyArray = await this.generateAnswer();

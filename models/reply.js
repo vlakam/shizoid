@@ -6,6 +6,11 @@ module.exports = function (sequelize, DataTypes) {
             defaultValue: 0
         }
     }, {
+	indexes: [
+            {
+                fields: ['PairId']
+            }
+        ],
         classMethods: {
             associate: function (models) {
                 Reply.belongsTo(models.Pair);
