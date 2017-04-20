@@ -61,12 +61,13 @@ message.prototype.process = async function () {
     }
 
     if (this.has_text()) {
-        if(Math.abs(this.message.date - Math.floor(Date.now() / 1000)) > 20) {
+        if (Math.abs(this.message.date - Math.floor(Date.now() / 1000)) > 20) {
             return;
         }
-	await models.Pair.learn(this);
+        await models.Pair.learn(this);
 
         if (this.hasAnchors() || this.isReplyToBot() || this.randomAnswer() || config.debug) {
+            this.bot.sendChatAction(msg.chat.id, 'typing');
             let replyArray = await this.generateAnswer();
             if (!_.size(replyArray) || !_.size(replyArray[0])) {
                 return;
@@ -82,7 +83,7 @@ message.prototype.process = async function () {
 };
 
 message.prototype.generateAnswer = async function () {
-    if(!this.chat) {
+    if (!this.chat) {
         this.chat = await models.Chat.getChat(this.message);
     }
     return models.Pair.generate(this);

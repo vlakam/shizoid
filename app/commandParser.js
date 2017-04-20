@@ -2,6 +2,8 @@ const {config} = require('../config/config.js');
 const models = require('../models');
 const _ = require('lodash');
 const Message = require('./message.js');
+const request = require('request');
+const path = require('path');
 
 const eightballAnswer = ['Бесспорно.',
     'Предрешено.',
@@ -109,6 +111,7 @@ CommandParser.prototype.get_pairs = async function (msg) {
 
 CommandParser.prototype.eightball = async function (msg) {
     let mm = new Message(this.bot, msg);
+    this.bot.sendChatAction(msg.chat.id, 'typing');
     let additionalAnswer = await mm.generateAnswer();
     mm.reply(_.sample(eightballAnswer) + ' ' + additionalAnswer.join(' '));
 };
@@ -135,6 +138,31 @@ CommandParser.prototype.banUser = async function (msg) {
     user.set('banned', !user.get('banned'));
     user.save();
     this.bot.sendMessage(msg.chat.id, 'Banned' + msg.text);
+};
+
+CommandParser.prototype.meow = async function (msg) {
+    let self = this;
+    request('http://random.cat/meow', function (err, res, body) {
+        if (err) {
+            console.log(err);
+            return this.bot.sendMessage(msg.chat.id, 'Котики не идут');
+        }
+
+        let imageUrl = JSON.parse(body).file;
+        let file = request(imageUrl);
+        let params = {
+            chat_id: msg.chat.id,
+            caption: imageUrl
+        };
+
+        if (path.extname(imageUrl) === '.gif') {
+            self.bot.sendChatAction(msg.chat.id, 'upload_document');
+            self.bot.sendVideo(msg.chat.id, file);
+        } else {
+            self.bot.sendChatAction(msg.chat.id, 'upload_photo');
+            self.bot.sendPhoto(msg.chat.id, file);
+        }
+    });
 };
 
 module.exports = CommandParser;
