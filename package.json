@@ -29,6 +29,7 @@
     "pg-hstore": "^2.3.2",
     "promise-seq": "^3.0.0",
     "promise-sequence": "^0.2.2",
+    "request": "^2.81.0",
     "sequelize": "^3.30.2"
   },
   "devDependencies": {

@@ -67,7 +67,7 @@ message.prototype.process = async function () {
         await models.Pair.learn(this);
 
         if (this.hasAnchors() || this.isReplyToBot() || this.randomAnswer() || config.debug) {
-            this.bot.sendChatAction(msg.chat.id, 'typing');
+            this.bot.sendChatAction(this.message.chat.id, 'typing');
             let replyArray = await this.generateAnswer();
             if (!_.size(replyArray) || !_.size(replyArray[0])) {
                 return;

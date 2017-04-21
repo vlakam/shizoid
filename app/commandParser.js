@@ -142,26 +142,19 @@ CommandParser.prototype.banUser = async function (msg) {
 
 CommandParser.prototype.meow = async function (msg) {
     let self = this;
-    request('http://random.cat/meow', function (err, res, body) {
+    request({
+        url: 'http://thecatapi.com/api/images/get?format=src&type=gif',
+        followAllRedirects: true
+    }, function (err, res, body) {
         if (err) {
             console.log(err);
             return this.bot.sendMessage(msg.chat.id, 'Котики не идут');
         }
 
-        let imageUrl = JSON.parse(body).file;
+        let imageUrl = res.request.uri.href;
         let file = request(imageUrl);
-        let params = {
-            chat_id: msg.chat.id,
-            caption: imageUrl
-        };
-
-        if (path.extname(imageUrl) === '.gif') {
-            self.bot.sendChatAction(msg.chat.id, 'upload_document');
-            self.bot.sendVideo(msg.chat.id, file);
-        } else {
-            self.bot.sendChatAction(msg.chat.id, 'upload_photo');
-            self.bot.sendPhoto(msg.chat.id, file);
-        }
+        self.bot.sendChatAction(msg.chat.id, 'upload_video');
+        self.bot.sendVideo(msg.chat.id, file);
     });
 };
 
