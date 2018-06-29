@@ -6,6 +6,7 @@ const request = require('request');
 const path = require('path');
 
 const eightballAnswer = ['Бесспорно.',
+    'тя ебет козла ебаного',
     'Предрешено.',
     'Никаких сомнений.',
     'Определённо да.',
