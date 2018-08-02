@@ -21,6 +21,7 @@
         bot.on('message', onNewMessage);
     }, function (error) {
         console.log(error);
+        process.exit(1);
     });
 
     function onNewMessage(msg) {

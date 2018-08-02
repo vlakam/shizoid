@@ -1,25 +1,20 @@
 version: "2"
 services:
     node:
-        image: node:10
+        build: .
         user: node
         working_dir: /home/node/app
         env_file: .env
         volumes:
             - ./:/home/node/app
-        restart: on-failure
+            - /home/node/app/node_modules
+        restart: always
         depends_on:
             - postgres
-        ports:
-            - "4040:4040"
-        expose:
-            - "4040"
         command: "npm run start"
     postgres:
         restart: always
         image: postgres:9.6.2-alpine
-        ports:
-            - "8000:5432"
         expose:
             - "5432"
         environment:
@@ -30,5 +25,5 @@ services:
             - postgresql-volume:/var/lib/postgresql/data
             - ./init:/docker-entrypoint-initdb.d/
 volumes:
-        postgresql-volume:
-            driver: 'local'
+    postgresql-volume:
+        driver: 'local'
