@@ -1,0 +1,34 @@
+version: "2"
+services:
+    node:
+        image: node:10
+        user: node
+        working_dir: /home/node/app
+        env_file: .env
+        volumes:
+            - ./:/home/node/app
+        restart: on-failure
+        depends_on:
+            - postgres
+        ports:
+            - "4040:4040"
+        expose:
+            - "4040"
+        command: "npm run start"
+    postgres:
+        restart: always
+        image: postgres:9.6.2-alpine
+        ports:
+            - "8000:5432"
+        expose:
+            - "5432"
+        environment:
+            - POSTGRES_USER=shizoid
+            - POSTGRES_PASSWORD=shizoid
+            - POSTGRES_DB=shizoid
+        volumes:
+            - postgresql-volume:/var/lib/postgresql/data
+            - ./init:/docker-entrypoint-initdb.d/
+volumes:
+        postgresql-volume:
+            driver: 'local'
