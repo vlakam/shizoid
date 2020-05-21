@@ -4,17 +4,11 @@ const _ = require('lodash');
 
 module.exports = function (sequelize) {
     let Pair = sequelize.define('Pair', {}, {
-	    indexes: [
-		{
-                	fields: ['ChatId']
-	        },
-		{
-                	fields: ['firstId']
-                },
-		{
-                	fields: ['secondId']
-	        }
-	    ],
+            indexes: [
+                {
+                    fields: ['ChatId', 'firstId', 'secondId']
+                }
+            ],
             classMethods: {
                 associate: function (models) {
                     Pair.belongsTo(models.Chat);
@@ -75,10 +69,7 @@ module.exports = function (sequelize) {
                         where: {
                             ChatId: chatId,
                             firstId: firstId,
-                            secondId: secondId,
-                            createdAt: {
-                                $lt: new Date((!config.debug) ? new Date() - 10 * 60 * 1000 : new Date())
-                            }
+                            secondId: secondId
                         },
                         include: [
                             {
