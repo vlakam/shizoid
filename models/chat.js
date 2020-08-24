@@ -1,44 +1,40 @@
-'use strict';
+"use strict";
 
 module.exports = function (sequelize, DataTypes) {
-  let Chat = sequelize.define('Chat', {
-    telegram_id: DataTypes.STRING,
-    chat_type: DataTypes.ENUM('private', 'group', 'supergroup'),
-    random_chance: {
+  let Chat = sequelize.define(
+    "Chat",
+    {
+      telegram_id: DataTypes.STRING,
+      chat_type: DataTypes.ENUM("private", "group", "supergroup"),
+      random_chance: {
         type: DataTypes.INTEGER(2),
-        defaultValue: 10
-    }
-  }, {
+        defaultValue: 10,
+      },
+    },
+    {
+      indexes: [
+        {
+          fields: ["telegram_id"],
+          unique: true,
+        },
+      ],
       classMethods: {
         associate: function (models) {
-            Chat.hasMany(models.Pair);
+          Chat.hasMany(models.Pair);
         },
         getChat: async function (tg_message) {
-            let chat = tg_message.chat;
-            let tg_id = chat.id;
-            let response = await Chat.findOrCreate({
-                where: {
-                    telegram_id: tg_id.toString(),
-                    chat_type: chat.type
-                },
-                defaults: {},
-                limit: 1
-            });
+          let chat = tg_message.chat;
+          let tg_id = chat.id;
+          let response = await Chat.findOrCreate({
+            where: {
+              telegram_id: tg_id.toString(),
+            },
+          });
 
-            return response[0];
-        }
+          return response[0];
+        },
       },
-      instanceMethods: {
-        migration: function (chatId) {
-            this.update({telegram_id: chatId})
-                .then(function (data) {
-                    console.log('Succesfully migrated to ' + chatId)
-                })
-                .catch(function () {
-                    console.log('Failed to migrate to chatId.');
-                });
-        }
-      }
-  });
+    }
+  );
   return Chat;
 };

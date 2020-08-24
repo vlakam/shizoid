@@ -1,5 +1,3 @@
-const setupCommands = (bot) => {
-
-};
+const setupCommands = (bot) => {};
 
 module.exports = setupCommands;
