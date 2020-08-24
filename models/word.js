@@ -1,6 +1,3 @@
-'use strict';
-const _ = require('lodash');
-
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define('Word', {
         word: DataTypes.STRING
@@ -14,18 +11,33 @@ module.exports = function (sequelize, DataTypes) {
         ],
         classMethods: {
             learn: async function (array) {
-                let Words = await this.findAll({
+                let uniqArray = array.filter((word, idx) => array.indexOf(word) === idx);
+                let wordsFromBase = await this.findAll({
                     where: {
-                        word: _.uniq(array)
+                        word: uniqArray
                     }
-                });
-                let newWords = _.difference(array, _.map(Words, oldWord => oldWord.get('word')));
-                await this.bulkCreate(_.map(newWords, function (newWord){ return {word: newWord}; }));
-                return this.findAll({
-                    where: {
-                        word: _.uniq(array)
+                })
+
+                let oldWords = wordsFromBase.reduce((acc, word) => {
+                    acc[word.get('word')] = word;
+
+                    return acc;
+                }, {});
+                let newWords = uniqArray.filter(word => !oldWords[word]);
+
+                if (newWords.length) {
+                    let result = await this.bulkCreate(newWords.map(word => ({ word })));
+                    return {
+                        ...oldWords,
+                        ...result.reduce((acc, word) => {
+                            acc[word.get('word')] = word;
+
+                            return acc;
+                        }, {})
                     }
-                });
+                } else {
+                    return oldWords;
+                }
             }
         }
     });

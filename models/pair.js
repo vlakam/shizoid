@@ -21,37 +21,39 @@ module.exports = function (sequelize) {
                     let Word = sequelize.import('./word');
                     let Reply = sequelize.import('./reply');
                     let response = await Word.learn(message.words);
-                    let words = [null];
-                    _.each(message.words, function (word) {
-                        words.push(_.find(response, (el) => el.get('word') === word).get('id'));
-                        if (_.indexOf(config.punctuation.endSentence, _.last(word)) >= 0) {
-                            words.push(null);
+                    let words = message.words.reduce((acc, word) => {
+                        acc.push(response[word].get('id'));
+                        if (config.punctuation.endSentence.indexOf(word[word.length - 1])) {
+                            acc.push(null);
                         }
-                    });
-                    if (_.last(words) !== null) words.push(null);
+
+                        return acc;
+                    }, [null]);
+
+                    if (words[words.length - 1] !== null) words.push(null);
 
                     while (_.size(words)) {
-                        let triplet = _.take(words, 3);
+                        let [ first, second, last ] = _.take(words, 3);
                         words.shift();
                         try {
                             let pair = (await self.findOrCreate({
                                 where: {
                                     ChatId: message.chat.get('id'),
-                                    firstId: triplet[0],
-                                    secondId: triplet[1]
+                                    firstId: first,
+                                    secondId: second
                                 },
                                 include: [{model: Reply, all: true}]
                             }))[0];
 
 
                             let reply = _.find(pair.Replies, function (reply) {
-                                return reply.get('WordId') === triplet[2];
+                                return reply.get('WordId') === last;
                             });
 
                             if (!reply) {
                                 pair.createReply({
                                     PairId: pair.get('id'),
-                                    WordId: triplet[2]
+                                    WordId: last
                                 })
                             } else {
                                 reply.increment('counter');

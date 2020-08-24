@@ -116,30 +116,6 @@ CommandParser.prototype.eightball = async function (msg) {
     mm.reply(_.sample(eightballAnswer) + ' ' + additionalAnswer.join(' '));
 };
 
-CommandParser.prototype.leaveAll = async function (msg) {
-    if (msg.from.id !== 36586950) {
-        return;
-    }
-
-    let chats = await models.Chat.findAll();
-    _.each(chats, (chat) => {
-        if(chat.get('chat_type') === 'supergroup' || chat.get('chat_type') === 'group')
-        this.bot.leaveChat(chat.get('telegram_id'));
-    });
-};
-
-CommandParser.prototype.banUser = async function (msg) {
-    if (msg.from.id !== 36586950) {
-        return;
-    }
-
-    let userId = msg.text;
-    let user = await models.User.getUser(userId);
-    user.set('banned', !user.get('banned'));
-    user.save();
-    this.bot.sendMessage(msg.chat.id, 'Banned' + msg.text);
-};
-
 CommandParser.prototype.meow = async function (msg) {
     let self = this;
     request({
