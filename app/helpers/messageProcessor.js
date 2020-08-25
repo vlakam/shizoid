@@ -7,10 +7,10 @@ class MessageProcessor {
   text = null;
   message = null;
 
-  constructor(ctx) {
+  constructor(ctx, text) {
     this.ctx = ctx;
     this.message = ctx.message;
-    this.text = this.message.text;
+    this.text = text || this.message.text;
     this.words = this.getWords();
   }
 

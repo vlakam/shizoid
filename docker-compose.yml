@@ -14,7 +14,7 @@ services:
         command: "npm run start"
     postgres:
         restart: always
-        image: postgres:9.6.2-alpine
+        image: postgres:9.6.8-alpine
         expose:
             - "5432"
         ports:

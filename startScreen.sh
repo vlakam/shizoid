@@ -1,1 +1,0 @@
-screen npm run start

@@ -14,8 +14,7 @@ module.exports = function (sequelize, DataTypes) {
     {
       indexes: [
         {
-          fields: ["telegram_id"],
-          unique: true,
+          fields: ["telegram_id"]
         },
       ],
       classMethods: {
