@@ -29,7 +29,7 @@ module.exports = function (sequelize) {
                     let words = message.words.reduce(
                         (acc, word) => {
                             acc.push(response[word].get('id'));
-                            if (config.punctuation.endSentence.indexOf(word[word.length - 1])) {
+                            if (config.punctuation.endSentence.includes(word[word.length - 1])) {
                                 acc.push(null);
                             }
 
