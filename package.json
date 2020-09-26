@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vlakam/shizoid-js.git"
+    "url": "git+https://github.com/vlakam/shizoid.git"
   },
   "keywords": [
     "telegram",
@@ -19,18 +19,13 @@
   "author": "Vladislav Kamenev",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vlakam/shizoid-js/issues"
+    "url": "https://github.com/vlakam/shizoid/issues"
   },
-  "homepage": "https://github.com/vlakam/shizoid-js#readme",
+  "homepage": "https://github.com/vlakam/shizoid#readme",
   "dependencies": {
     "dotenv": "^8.2.0",
     "lodash": "^4.17.4",
-    "node-telegram-bot-api": "^0.27.0",
     "pg": "^6.1.2",
-    "pg-hstore": "^2.3.2",
-    "promise-seq": "^3.0.0",
-    "promise-sequence": "^0.2.2",
-    "request": "^2.81.0",
     "sequelize": "^3.30.2",
     "telegraf": "^3.38.0"
   },
