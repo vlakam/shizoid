@@ -39,5 +39,5 @@ jspm_packages
 db.sqlite
 *.sql
 
-.env
-.7z
+*.env
+*.7z
