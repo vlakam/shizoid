@@ -2,7 +2,8 @@ const models = require('../../models');
 const { MessageProcessor } = require('../helpers/messageProcessor');
 const _ = require('lodash');
 
-const eightballAnswer = ['Бесспорно.',
+const eightballAnswer = [
+    'Бесспорно.',
     'Предрешено.',
     'Никаких сомнений.',
     'Определённо да.',
@@ -21,7 +22,9 @@ const eightballAnswer = ['Бесспорно.',
     'Мой ответ — «нет».',
     'По моим данным — «нет».',
     'Перспективы не очень хорошие.',
-    'Весьма сомнительно.'];
+    'Весьма сомнительно.',
+    'Тя ебет, козла ебаного?'
+];
 
 const setupEightballCommand = (bot) => {
     bot.hears(/\/eightball (.*)/, async (ctx) => {
