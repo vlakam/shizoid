@@ -3,8 +3,7 @@ const adminMiddleware = require('../middlewares/adminMiddleware');
 
 const setupPairsCommand = (bot) => {
     bot.command('get_pairs', adminMiddleware ,async (ctx) => {
-        const chat = await models.Chat.getChat(ctx.message);
-        const counter = await models.Pair.count({where: {ChatId:258}});
+        const counter = await models.Pair.count({where: {telegram_id: ctx.chat.id.toString()}});
     
         return ctx.reply(`Known pairs for this chat: ${counter}`, { reply_to_message_id: ctx.message.message_id });
     })
