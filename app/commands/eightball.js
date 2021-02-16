@@ -24,7 +24,7 @@ const eightballAnswer = ['Бесспорно.',
     'Весьма сомнительно.'];
 
 const setupEightballCommand = (bot) => {
-    bot.hears(/\/eightball (.*)/, async (ctx) => {
+    bot.hears(/\/eightball(?:@.+)? (.*)/, async (ctx) => {
         const [_a, text] = ctx.match;
         const message = new MessageProcessor(ctx, text);
     

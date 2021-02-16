@@ -13,7 +13,7 @@ const setupGetGab = (bot) =>
     });
 
 const setupSetGab = (bot) =>
-    bot.hears(/^\/set_gab (\d+)/, adminMiddleware, async (ctx) => {
+    bot.hears(/^\/set_gab(?:@.+)? (\d+)/, adminMiddleware, async (ctx) => {
         const [_, gab] = ctx.match;
         const chat = await models.Chat.getChat(ctx.message);
 
