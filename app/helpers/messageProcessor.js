@@ -63,7 +63,7 @@ class MessageProcessor {
 
   randomOK() {
     const rng = Math.floor(Math.random() * 100);
-    return rng >= this.chat.random_chance;
+    return rng <= this.chat.random_chance;
   }
 
   async generateAnswer() {
