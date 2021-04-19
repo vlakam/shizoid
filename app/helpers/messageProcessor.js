@@ -76,7 +76,7 @@ class MessageProcessor {
 }
 
 const setupMessageProcessor = (bot) => {
-  bot.on("message", (ctx) => {
+  bot.on("text", (ctx) => {
     let mp = new MessageProcessor(ctx);
     mp.process();
   });
